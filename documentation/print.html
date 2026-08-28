@@ -358,6 +358,26 @@ For more details, each subcommand has its own help section when run with the
 <code>[session-name]</code>.
 If given no <code>[session-name]</code> and there is only one running session, it will attach to that session.</p>
 <p>The attach subcommand will also accept the optional <code>options</code> subcommand.</p>
+<h3 id="starting-a-session-with-an-initial-command"><a class="header" href="#starting-a-session-with-an-initial-command">Starting a session with an initial command</a></h3>
+<p>Trailing arguments given after <code>--</code> are run as a command in the first pane of the
+session:</p>
+<pre><code>$ zellij attach -c my-session -- htop
+</code></pre>
+<p>This works both when creating a session in the foreground (<code>-c</code>, <code>--create</code>) and in the
+background (<code>-b</code>, <code>--create-background</code>).</p>
+<p>The command only runs if the session is created by this invocation. When attaching to an
+already running session, the trailing command is ignored.</p>
+<p>If a <a href="./layouts.html">layout</a> is used, the pane running the command is placed in the
+focused tab.</p>
+<p>Two flags change how the initial command behaves. Both require an initial command to be
+given:</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Flag</th><th>Description</th></tr></thead><tbody>
+<tr><td style="text-align: left">--close-on-exit</td><td>Close the initial command's pane as soon as the command exits. By default the pane is held open</td></tr>
+<tr><td style="text-align: left">--start-suspended</td><td>Start the command suspended - it is only run once ENTER is pressed for the first time</td></tr>
+</tbody></table>
+</div>
+<p>Initial commands are not supported for remote (<a href="./web-client.html">web client</a>) sessions -
+the CLI will error out.</p>
 <h2 id="list-sessions"><a class="header" href="#list-sessions"><code>list-sessions</code></a></h2>
 <p>short: <code>ls</code></p>
 <p>Will list all the names of currently running sessions.</p>
@@ -547,6 +567,8 @@ zellij setup --dump-config &gt; ~/.config/zellij/config.kdl
 <li><a href="options.html#host_notification_protocol">host_notification_protocol</a></li>
 <li><a href="options.html#nested_session_handling">nested_session_handling</a></li>
 <li><a href="options.html#dangerously_enable_paste_buffer_read">dangerously_enable_paste_buffer_read</a></li>
+<li><a href="options.html#scroll_mode_sync">scroll_mode_sync</a></li>
+<li><a href="options.html#explicit_theme_hue">explicit_theme_hue</a></li>
 </ul>
 <hr />
 <h3 id="on_force_close"><a class="header" href="#on_force_close">on_force_close</a></h3>
@@ -1010,6 +1032,26 @@ Options:</p>
 </ul>
 <pre><code class="language-javascript">dangerously_enable_paste_buffer_read true
 </code></pre>
+<h3 id="scroll_mode_sync"><a class="header" href="#scroll_mode_sync">scroll_mode_sync</a></h3>
+<p>Whether scrolling a pane implicitly enters and exits <a href="./keybindings-modes.html#a-note-about-scroll-mode"><code>scroll</code> mode</a>. When false, scrolling a pane (eg. with the mouse wheel) leaves the current mode alone, and <code>scroll</code> mode is only entered through an explicit keybinding.</p>
+<p>Options:</p>
+<ul>
+<li>true (default)</li>
+<li>false</li>
+</ul>
+<pre><code class="language-javascript">scroll_mode_sync false
+</code></pre>
+<h3 id="explicit_theme_hue"><a class="header" href="#explicit_theme_hue">explicit_theme_hue</a></h3>
+<p>Pin the session to a dark or light appearance, ignoring the color scheme reported by the host terminal. It is resolved before the first render, so the session starts with the intended appearance rather than correcting itself once the terminal replies. See <a href="./themes.html#overriding-the-terminals-reported-hue">themes</a>.</p>
+<p>Options:</p>
+<ul>
+<li>"dark" - always treat the terminal as being in dark mode</li>
+<li>"light" - always treat the terminal as being in light mode</li>
+</ul>
+<p>Default: unset - the host terminal decides</p>
+<p>This only selects which of <a href="options.html#theme_dark"><code>theme_dark</code></a> / <a href="options.html#theme_light"><code>theme_light</code></a> applies. Both of those must be set for dark/light switching to happen at all - otherwise <a href="options.html#theme"><code>theme</code></a> remains authoritative.</p>
+<pre><code class="language-javascript">explicit_theme_hue "dark"
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="configuring-keybindings"><a class="header" href="#configuring-keybindings">Configuring Keybindings</a></h1>
 <p>Zellij comes with a default set of keybindings that try to fit as many different users and use cases while trying to maximize comfort for everyone.</p>
 <p>It is possible to add to these defaults or even override them with an external configuration. For more information about the configuration file itself, see <a href="./configuration.html">Configuration</a>.</p>
@@ -1068,6 +1110,7 @@ Options:</p>
 <h2 id="a-note-about-scroll-mode"><a class="header" href="#a-note-about-scroll-mode">A note about <code>scroll</code> mode</a></h2>
 <p>Leaving <code>scroll</code> mode keeps the scroll position of the pane - the pane is no longer scrolled back down to the bottom automatically. To scroll to the bottom and leave the mode, use a binding that includes the <a href="./keybindings-possible-actions.html#scrolltobottom"><code>ScrollToBottom</code></a> action.</p>
 <p>Focusing a pane that is scrolled back automatically enters <code>scroll</code> mode, and focusing a pane that is not scrolled back returns to <code>normal</code> mode.</p>
+<p>Scrolling a pane also enters and exits <code>scroll</code> mode implicitly. This can be turned off with the <a href="./options.html#scroll_mode_sync"><code>scroll_mode_sync</code></a> option, in which case <code>scroll</code> mode is only entered through an explicit keybinding.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="binding-keys"><a class="header" href="#binding-keys">Binding keys</a></h1>
 <p>Keys are bound with <code>bind</code> instructions inside each mode. A <code>bind</code> instruction consists of a list of keys to be bound, as well as a list of actions to be bound to each of those keys.</p>
 <p><em>Note</em>: All actions will be performed with no sequential guarantees.</p>
@@ -1747,6 +1790,12 @@ theme_light "catppuccin-latte"
 </tbody></table>
 </div>
 <p>Programs running inside panes can subscribe to color scheme changes themselves with <code>CSI ? 2031 h</code> and will receive <code>CSI ?997;1 n</code> (dark) or <code>CSI ?997;2 n</code> (light) whenever the mode changes.</p>
+<h2 id="overriding-the-terminals-reported-hue"><a class="header" href="#overriding-the-terminals-reported-hue">Overriding the terminal's reported hue</a></h2>
+<p>The <a href="./options.html#explicit_theme_hue"><code>explicit_theme_hue</code></a> option pins the session to a dark or light appearance, ignoring what the host terminal reports:</p>
+<pre><code class="language-javascript">explicit_theme_hue "dark"
+</code></pre>
+<p>It is resolved before the first render, so the session starts with the intended appearance instead of correcting itself once the terminal replies. This is useful for terminals that report the wrong color scheme, or that do not report one at all. When it is unset, the host terminal decides.</p>
+<p>Since it only selects which of <code>theme_dark</code> / <code>theme_light</code> applies, <strong>both</strong> of those must still be set - otherwise the static <code>theme</code> remains authoritative.</p>
 <h2 id="theme-definition-specification"><a class="header" href="#theme-definition-specification">Theme Definition Specification</a></h2>
 <p>Themes in Zellij are defined according to UI components. These components are used in the various plugins that make up the Zellij interface, and can also be used dynamically in user plugins.</p>
 <p><img src="/img/theme-spec.png" alt="theme definition spec diagram" /></p>
@@ -1937,121 +1986,283 @@ theme_light "catppuccin-latte"
 <blockquote>
 <p><strong>Migration Note:</strong> The <code>--disable-mouse-mode</code> and <code>--no-pane-frames</code> flags have been removed. Use <code>--mouse-mode false</code> (equivalent of <code>--disable-mouse-mode</code>) and <code>--pane-frames false</code> (equivalent of <code>--no-pane-frames</code>) instead.</p>
 </blockquote>
-<p>Every option that can be set in the <a href="./options.html">configuration file</a> also has a corresponding flag here, using the same name in kebab-case (eg. the <code>nested_session_handling</code> option is <code>--nested-session-handling</code>).</p>
+<p>Every option that can be set in the <a href="./options.html">configuration file</a> also has a corresponding flag here, in nearly all cases using the same name in kebab-case (eg. the <code>nested_session_handling</code> option is <code>--nested-session-handling</code>). The exceptions are <code>pane_viewport_serialization</code>, whose flag is <code>--serialize-pane-viewport</code>, and the web server options (<code>web_server_ip</code>, <code>web_server_port</code>, <code>web_server_cert</code>, <code>web_server_key</code>, <code>enforce_https_on_localhost</code>), which are taken as positional arguments rather than flags.</p>
 <blockquote>
 <p><strong>Note:</strong> since <code>0.45.0</code> (which uses clap 4 for argument parsing), repeating the same flag no longer produces an error - the last occurrence overrides the previous ones. Help output is also styled and colored.</p>
 </blockquote>
-<pre><code>USAGE:
-    zellij options [OPTIONS]
+<p>The listing below is the output of <code>zellij options --help</code>. A shorter summary is available with <code>zellij options -h</code>.</p>
+<pre><code>Change the behaviour of zellij
 
-OPTIONS:
-        --attach-to-session &lt;ATTACH_TO_SESSION&gt;
-            Whether to attach to a session specified in "session-name" if it exists [possible
-            values: true, false]
+Usage: zellij options [OPTIONS] [WEB_SERVER_IP] [WEB_SERVER_PORT] [WEB_SERVER_CERT] [WEB_SERVER_KEY] [ENFORCE_HTTPS_FOR_LOCALHOST]
 
-        --copy-clipboard &lt;COPY_CLIPBOARD&gt;
-            OSC52 destination clipboard [possible values: system, primary]
+Arguments:
+  [WEB_SERVER_IP]
 
-        --copy-command &lt;COPY_COMMAND&gt;
-            Switch to using a user supplied command for clipboard instead of OSC52
 
-        --copy-on-select &lt;COPY_ON_SELECT&gt;
-            Automatically copy when selecting text (true or false) [possible values: true, false]
+  [WEB_SERVER_PORT]
 
-        --dangerously-enable-paste-buffer-read &lt;DANGEROUSLY_ENABLE_PASTE_BUFFER_READ&gt;
-            Allow programs running in panes to read the clipboard through OSC 52 (true or false)
-            [possible values: true, false]
 
-        --default-layout &lt;DEFAULT_LAYOUT&gt;
-            Set the default layout
+  [WEB_SERVER_CERT]
 
-        --default-mode &lt;DEFAULT_MODE&gt;
-            Set the default mode
 
-        --default-shell &lt;DEFAULT_SHELL&gt;
-            Set the default shell
+  [WEB_SERVER_KEY]
 
-        --disable-mouse-mode
-            Disable handling of mouse events (REMOVED - use --mouse-mode false instead)
 
-        --host-notification-protocol &lt;HOST_NOTIFICATION_PROTOCOL&gt;
-            The protocol used to forward pane notifications to the host terminal [possible values:
-            auto, osc9, osc99, bell, off]
+  [ENFORCE_HTTPS_FOR_LOCALHOST]
+          [possible values: true, false]
 
-        --layout-dir &lt;LAYOUT_DIR&gt;
-            Set the layout_dir, defaults to subdirectory of config dir
+Options:
+      --simplified-ui &lt;SIMPLIFIED_UI&gt;
+          Allow plugins to use a more simplified layout that is compatible with more fonts (true or false)
 
-        --mirror-session &lt;MIRROR_SESSION&gt;
-            Mirror session when multiple users are connected (true or false) [possible values: true,
-            false]
+          [possible values: true, false]
 
-        --mouse-hover-tips &lt;MOUSE_HOVER_TIPS&gt;
-            Show contextual help tips when hovering with the mouse (true or false) [possible values:
-            true, false]
+      --theme &lt;THEME&gt;
+          Set the default theme
 
-        --mouse-mode &lt;MOUSE_MODE&gt;
-            Set the handling of mouse events (true or false) Can be temporarily bypassed by the
-            [SHIFT] key [possible values: true, false]
+      --theme-dark &lt;THEME_DARK&gt;
+          Theme name to apply when the host terminal reports a dark color palette (CSI 2031 / DSR 997). Requires
+          `theme_light` to also be set; if either is missing the static `theme` remains authoritative
 
-        --mouse-scroll-resize &lt;MOUSE_SCROLL_RESIZE&gt;
-            Resize the focused pane with Ctrl + ScrollWheel (true or false) [possible values: true,
-            false]
+      --theme-light &lt;THEME_LIGHT&gt;
+          Theme name to apply when the host terminal reports a light color palette (CSI 2031 / DSR 997). Requires
+          `theme_dark` to also be set; if either is missing the static `theme` remains authoritative
 
-        --nested-session-handling &lt;NESTED_SESSION_HANDLING&gt;
-            How to handle a nested Zellij session running inside a pane [possible values: ask,
-            fullscreen, descend, never]
+      --explicit-theme-hue &lt;EXPLICIT_THEME_HUE&gt;
+          Pin the session to a dark or light appearance ("dark" or "light"), resolved before the first render and kept
+          authoritative over ambient host terminal reports (CSI 2031 / DSR 997). When unset, the session follows the
+          host terminal
 
-        --no-pane-frames
-            Disable display of pane frames (REMOVED - use --pane-frames false instead)
+      --default-mode &lt;DEFAULT_MODE&gt;
+          Set the default mode
 
-        --on-force-close &lt;ON_FORCE_CLOSE&gt;
-            Set behaviour on force close (quit or detach)
+      --default-shell &lt;DEFAULT_SHELL&gt;
+          Set the default shell
 
-        --osc133-command-selection &lt;OSC133_COMMAND_SELECTION&gt;
-            Select the whole command and its output when triple-clicking inside OSC 133 marked
-            output (true or false) [possible values: true, false]
+      --default-cwd &lt;DEFAULT_CWD&gt;
+          Set the default cwd
 
-        --pane-frames &lt;PANE_FRAMES&gt;
-            Set display of the pane frames (true or false) [possible values: true, false]
+      --default-layout &lt;DEFAULT_LAYOUT&gt;
+          Set the default layout
 
-        --pane-frame-style &lt;PANE_FRAME_STYLE&gt;
-            Set the style of the pane frames [possible values: full, titles, none]
+      --layout-dir &lt;LAYOUT_DIR&gt;
+          Set the layout_dir, defaults to subdirectory of config dir
 
-        --scroll-buffer-size &lt;SCROLL_BUFFER_SIZE&gt;
-            The number of lines to keep in the scrollback buffer of each pane
+      --theme-dir &lt;THEME_DIR&gt;
+          Set the theme_dir, defaults to subdirectory of config dir
 
-        --scrollback-editor &lt;SCROLLBACK_EDITOR&gt;
-            Explicit full path to open the scrollback editor (default is $EDITOR or $VISUAL)
+      --mouse-mode &lt;MOUSE_MODE&gt;
+          Set the handling of mouse events (true or false) Can be temporarily bypassed by the [SHIFT] key
 
-        --session-name &lt;SESSION_NAME&gt;
-            The name of the session to create when starting Zellij
+          [possible values: true, false]
 
-        --simplified-ui &lt;SIMPLIFIED_UI&gt;
-            Allow plugins to use a more simplified layout that is compatible with more fonts (true
-            or false) [possible values: true, false]
+      --pane-frames &lt;PANE_FRAMES&gt;
+          Set display of the pane frames (true or false)
 
-        --stacked-pane-list &lt;STACKED_PANE_LIST&gt;
-            Render stacked panes as a list of titles with the expanded pane at the bottom (true or
-            false) [possible values: true, false]
+          [possible values: true, false]
 
-        --support-kitty-graphics-protocol &lt;SUPPORT_KITTY_GRAPHICS_PROTOCOL&gt;
-            Support the kitty graphics (image) protocol, if the terminal supports it (true or false)
-            [possible values: true, false]
+      --pane-frame-style &lt;PANE_FRAME_STYLE&gt;
 
-        --theme &lt;THEME&gt;
-            Set the default theme
 
-        --theme-dark &lt;THEME_DARK&gt;
-            Set the theme to use when the host terminal is in dark mode
+      --mirror-session &lt;MIRROR_SESSION&gt;
+          Mirror session when multiple users are connected (true or false)
 
-        --theme-dir &lt;THEME_DIR&gt;
-            Set the theme_dir, defaults to subdirectory of config dir
+          [possible values: true, false]
 
-        --theme-light &lt;THEME_LIGHT&gt;
-            Set the theme to use when the host terminal is in light mode
+      --on-force-close &lt;ON_FORCE_CLOSE&gt;
+          Set behaviour on force close (quit or detach)
 
-        --word-separators &lt;WORD_SEPARATORS&gt;
-            The characters (in addition to whitespace) that terminate a word when double-clicking
+      --scroll-buffer-size &lt;SCROLL_BUFFER_SIZE&gt;
+
+
+      --copy-command &lt;COPY_COMMAND&gt;
+          Switch to using a user supplied command for clipboard instead of OSC52
+
+      --copy-clipboard &lt;COPY_CLIPBOARD&gt;
+          OSC52 destination clipboard
+
+          [possible values: system, primary]
+
+      --copy-on-select &lt;COPY_ON_SELECT&gt;
+          Automatically copy when selecting text (true or false)
+
+          [possible values: true, false]
+
+      --osc8-hyperlinks &lt;OSC8_HYPERLINKS&gt;
+          Enable OSC8 hyperlink output (true or false)
+
+          [possible values: true, false]
+
+      --scrollback-editor &lt;SCROLLBACK_EDITOR&gt;
+          Explicit full path to open the scrollback editor (default is $EDITOR or $VISUAL)
+
+      --session-name &lt;SESSION_NAME&gt;
+          The name of the session to create when starting Zellij
+
+      --attach-to-session &lt;ATTACH_TO_SESSION&gt;
+          Whether to attach to a session specified in "session-name" if it exists
+
+          [possible values: true, false]
+
+      --auto-layout &lt;AUTO_LAYOUT&gt;
+          Whether to lay out panes in a predefined set of layouts whenever possible
+
+          [possible values: true, false]
+
+      --session-serialization &lt;SESSION_SERIALIZATION&gt;
+          Whether sessions should be serialized to the HD so that they can be later resurrected, default is true
+
+          [possible values: true, false]
+
+      --serialize-pane-viewport &lt;SERIALIZE_PANE_VIEWPORT&gt;
+          Whether pane viewports are serialized along with the session, default is false
+
+          [possible values: true, false]
+
+      --scrollback-lines-to-serialize &lt;SCROLLBACK_LINES_TO_SERIALIZE&gt;
+          Scrollback lines to serialize along with the pane viewport when serializing sessions, 0 defaults to the
+          scrollback size. If this number is higher than the scrollback size, it will also default to the scrollback
+          size
+
+      --styled-underlines &lt;STYLED_UNDERLINES&gt;
+          Whether to use ANSI styled underlines
+
+          [possible values: true, false]
+
+      --serialization-interval &lt;SERIALIZATION_INTERVAL&gt;
+          The interval at which to serialize sessions for resurrection (in seconds)
+
+      --disable-session-metadata &lt;DISABLE_SESSION_METADATA&gt;
+          If true, will disable writing session metadata to disk
+
+          [possible values: true, false]
+
+      --support-kitty-keyboard-protocol &lt;SUPPORT_KITTY_KEYBOARD_PROTOCOL&gt;
+          Whether to enable support for the Kitty keyboard protocol (must also be supported by the host terminal),
+          defaults to true if the terminal supports it
+
+          [possible values: true, false]
+
+      --support-kitty-graphics-protocol &lt;SUPPORT_KITTY_GRAPHICS_PROTOCOL&gt;
+          Whether to enable support for the Kitty graphics (image) protocol (must also be supported by the host
+          terminal), defaults to true if the terminal supports it
+
+          [possible values: true, false]
+
+      --web-server &lt;WEB_SERVER&gt;
+          Whether to make sure a local web server is running when a new Zellij session starts. This web server will
+          allow creating new sessions and attaching to existing ones that have opted in to being shared in the browser.
+
+          Note: a local web server can still be manually started from within a Zellij session or from the CLI. If this
+          is not desired, one can use a version of Zellij compiled without web_server_capability
+
+          Possible values: - true - false Default: false
+
+          [possible values: true, false]
+
+      --web-sharing &lt;WEB_SHARING&gt;
+          Whether to allow new sessions to be shared through a local web server, assuming one is running (see the
+          `web_server` option for more details).
+
+          Note: if Zellij was compiled without web_server_capability, this option will be locked to "disabled"
+
+          Possible values: - "on" (new sessions will allow web sharing through the local web server if it is online) -
+          "off" (new sessions will not allow web sharing unless they explicitly opt-in to it) - "disabled" (new sessions
+          will not allow web sharing and will not be able to opt-in to it) Default: "off"
+
+          [possible values: on, off, disabled]
+
+      --stacked-resize &lt;STACKED_RESIZE&gt;
+          Whether to stack panes when resizing beyond a certain size default is true
+
+          [possible values: true, false]
+
+      --stacked-pane-list &lt;STACKED_PANE_LIST&gt;
+          [possible values: true, false]
+
+      --show-startup-tips &lt;SHOW_STARTUP_TIPS&gt;
+          Whether to show startup tips when starting a new session default is true
+
+          [possible values: true, false]
+
+      --show-release-notes &lt;SHOW_RELEASE_NOTES&gt;
+          Whether to show release notes on first run of a new version default is true
+
+          [possible values: true, false]
+
+      --advanced-mouse-actions &lt;ADVANCED_MOUSE_ACTIONS&gt;
+          Whether to enable mouse hover effects and pane grouping functionality default is true
+
+          [possible values: true, false]
+
+      --mouse-scroll-resize &lt;MOUSE_SCROLL_RESIZE&gt;
+          Whether Ctrl+ScrollWheel resizes panes default is true
+
+          [possible values: true, false]
+
+      --scroll-mode-sync &lt;SCROLL_MODE_SYNC&gt;
+          Whether scrolling a pane implicitly enters (and leaving the scroll implicitly exits) Scroll mode default is
+          true
+
+          [possible values: true, false]
+
+      --mouse-hover-effects &lt;MOUSE_HOVER_EFFECTS&gt;
+          Whether to enable mouse hover visual effects (frame highlight and help text) default is true
+
+          [possible values: true, false]
+
+      --mouse-hover-tips &lt;MOUSE_HOVER_TIPS&gt;
+          Whether to show mouse hover help-text tips (resize help and group shortcuts) default is true
+
+          [possible values: true, false]
+
+      --visual-bell &lt;VISUAL_BELL&gt;
+          Whether to show visual bell indicators (pane/tab frame flash and [!] suffix) default is true
+
+          [possible values: true, false]
+
+      --focus-follows-mouse &lt;FOCUS_FOLLOWS_MOUSE&gt;
+          Whether to focus panes on mouse hover (true or false) default is false
+
+          [possible values: true, false]
+
+      --mouse-click-through &lt;MOUSE_CLICK_THROUGH&gt;
+          Whether clicking a pane to focus it also sends the click into the pane (true or false) default is false
+
+          [possible values: true, false]
+
+      --osc133-command-selection &lt;OSC133_COMMAND_SELECTION&gt;
+          Whether triple-clicking inside shell-marked (OSC 133) command output selects the command and its output rather
+          than the logical line default is true
+
+          [possible values: true, false]
+
+      --word-separators &lt;WORD_SEPARATORS&gt;
+          Characters that terminate a word when double-clicking to select it, in addition to whitespace (which is always
+          a separator) default is "[]{}&lt;&gt;()"
+
+      --host-notification-protocol &lt;HOST_NOTIFICATION_PROTOCOL&gt;
+          [possible values: auto, osc9, osc99, bell, off]
+
+      --post-command-discovery-hook &lt;POST_COMMAND_DISCOVERY_HOOK&gt;
+          A command to run after the discovery of running commands when serializing, for the purpose of manipulating the
+          command (eg. with a regex) before it gets serialized
+
+      --client-async-worker-tasks &lt;CLIENT_ASYNC_WORKER_TASKS&gt;
+          Number of async worker tasks to spawn per active client.
+
+          Allocating few tasks may result in resource contention and lags. Small values (around 4) should typically work
+          best. Set to 0 to use the number of (physical) CPU cores. NOTE: This only applies to web clients at the
+          moment.
+
+      --nested-session-handling &lt;NESTED_SESSION_HANDLING&gt;
+          How to handle a nested Zellij session detected inside a pane (ask, fullscreen, descend, never)
+
+      --dangerously-enable-paste-buffer-read &lt;DANGEROUSLY_ENABLE_PASTE_BUFFER_READ&gt;
+          [possible values: true, false]
+
+  -h, --help
+          Print help (see a summary with '-h')
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="controlling-zellij-through-the-cli"><a class="header" href="#controlling-zellij-through-the-cli">Controlling Zellij through the CLI</a></h1>
 <p>Zellij can be controlled through the CLI. Whether inside or outside a zellij session, one can issue commands from the terminal to interact with any session running on the machine.</p>
