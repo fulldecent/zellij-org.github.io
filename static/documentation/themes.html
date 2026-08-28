@@ -170,6 +170,12 @@ theme_light "catppuccin-latte"
 </tbody></table>
 </div>
 <p>Programs running inside panes can subscribe to color scheme changes themselves with <code>CSI ? 2031 h</code> and will receive <code>CSI ?997;1 n</code> (dark) or <code>CSI ?997;2 n</code> (light) whenever the mode changes.</p>
+<h2 id="overriding-the-terminals-reported-hue"><a class="header" href="#overriding-the-terminals-reported-hue">Overriding the terminal's reported hue</a></h2>
+<p>The <a href="./options.html#explicit_theme_hue"><code>explicit_theme_hue</code></a> option pins the session to a dark or light appearance, ignoring what the host terminal reports:</p>
+<pre><code class="language-javascript">explicit_theme_hue "dark"
+</code></pre>
+<p>It is resolved before the first render, so the session starts with the intended appearance instead of correcting itself once the terminal replies. This is useful for terminals that report the wrong color scheme, or that do not report one at all. When it is unset, the host terminal decides.</p>
+<p>Since it only selects which of <code>theme_dark</code> / <code>theme_light</code> applies, <strong>both</strong> of those must still be set - otherwise the static <code>theme</code> remains authoritative.</p>
 <h2 id="theme-definition-specification"><a class="header" href="#theme-definition-specification">Theme Definition Specification</a></h2>
 <p>Themes in Zellij are defined according to UI components. These components are used in the various plugins that make up the Zellij interface, and can also be used dynamically in user plugins.</p>
 <p><img src="/img/theme-spec.png" alt="theme definition spec diagram" /></p>

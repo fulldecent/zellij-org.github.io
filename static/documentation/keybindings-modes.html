@@ -183,6 +183,7 @@
 <h2 id="a-note-about-scroll-mode"><a class="header" href="#a-note-about-scroll-mode">A note about <code>scroll</code> mode</a></h2>
 <p>Leaving <code>scroll</code> mode keeps the scroll position of the pane - the pane is no longer scrolled back down to the bottom automatically. To scroll to the bottom and leave the mode, use a binding that includes the <a href="./keybindings-possible-actions.html#scrolltobottom"><code>ScrollToBottom</code></a> action.</p>
 <p>Focusing a pane that is scrolled back automatically enters <code>scroll</code> mode, and focusing a pane that is not scrolled back returns to <code>normal</code> mode.</p>
+<p>Scrolling a pane also enters and exits <code>scroll</code> mode implicitly. This can be turned off with the <a href="./options.html#scroll_mode_sync"><code>scroll_mode_sync</code></a> option, in which case <code>scroll</code> mode is only entered through an explicit keybinding.</p>
 
                     </main>
 

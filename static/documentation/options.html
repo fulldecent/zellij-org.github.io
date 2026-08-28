@@ -218,6 +218,8 @@
 <li><a href="#host_notification_protocol">host_notification_protocol</a></li>
 <li><a href="#nested_session_handling">nested_session_handling</a></li>
 <li><a href="#dangerously_enable_paste_buffer_read">dangerously_enable_paste_buffer_read</a></li>
+<li><a href="#scroll_mode_sync">scroll_mode_sync</a></li>
+<li><a href="#explicit_theme_hue">explicit_theme_hue</a></li>
 </ul>
 <hr />
 <h3 id="on_force_close"><a class="header" href="#on_force_close">on_force_close</a></h3>
@@ -680,6 +682,26 @@ Options:</p>
 <li>false (default)</li>
 </ul>
 <pre><code class="language-javascript">dangerously_enable_paste_buffer_read true
+</code></pre>
+<h3 id="scroll_mode_sync"><a class="header" href="#scroll_mode_sync">scroll_mode_sync</a></h3>
+<p>Whether scrolling a pane implicitly enters and exits <a href="./keybindings-modes.html#a-note-about-scroll-mode"><code>scroll</code> mode</a>. When false, scrolling a pane (eg. with the mouse wheel) leaves the current mode alone, and <code>scroll</code> mode is only entered through an explicit keybinding.</p>
+<p>Options:</p>
+<ul>
+<li>true (default)</li>
+<li>false</li>
+</ul>
+<pre><code class="language-javascript">scroll_mode_sync false
+</code></pre>
+<h3 id="explicit_theme_hue"><a class="header" href="#explicit_theme_hue">explicit_theme_hue</a></h3>
+<p>Pin the session to a dark or light appearance, ignoring the color scheme reported by the host terminal. It is resolved before the first render, so the session starts with the intended appearance rather than correcting itself once the terminal replies. See <a href="./themes.html#overriding-the-terminals-reported-hue">themes</a>.</p>
+<p>Options:</p>
+<ul>
+<li>"dark" - always treat the terminal as being in dark mode</li>
+<li>"light" - always treat the terminal as being in light mode</li>
+</ul>
+<p>Default: unset - the host terminal decides</p>
+<p>This only selects which of <a href="#theme_dark"><code>theme_dark</code></a> / <a href="#theme_light"><code>theme_light</code></a> applies. Both of those must be set for dark/light switching to happen at all - otherwise <a href="#theme"><code>theme</code></a> remains authoritative.</p>
+<pre><code class="language-javascript">explicit_theme_hue "dark"
 </code></pre>
 
                     </main>

@@ -162,6 +162,26 @@ For more details, each subcommand has its own help section when run with the
 <code>[session-name]</code>.
 If given no <code>[session-name]</code> and there is only one running session, it will attach to that session.</p>
 <p>The attach subcommand will also accept the optional <code>options</code> subcommand.</p>
+<h3 id="starting-a-session-with-an-initial-command"><a class="header" href="#starting-a-session-with-an-initial-command">Starting a session with an initial command</a></h3>
+<p>Trailing arguments given after <code>--</code> are run as a command in the first pane of the
+session:</p>
+<pre><code>$ zellij attach -c my-session -- htop
+</code></pre>
+<p>This works both when creating a session in the foreground (<code>-c</code>, <code>--create</code>) and in the
+background (<code>-b</code>, <code>--create-background</code>).</p>
+<p>The command only runs if the session is created by this invocation. When attaching to an
+already running session, the trailing command is ignored.</p>
+<p>If a <a href="./layouts.html">layout</a> is used, the pane running the command is placed in the
+focused tab.</p>
+<p>Two flags change how the initial command behaves. Both require an initial command to be
+given:</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Flag</th><th>Description</th></tr></thead><tbody>
+<tr><td style="text-align: left">--close-on-exit</td><td>Close the initial command's pane as soon as the command exits. By default the pane is held open</td></tr>
+<tr><td style="text-align: left">--start-suspended</td><td>Start the command suspended - it is only run once ENTER is pressed for the first time</td></tr>
+</tbody></table>
+</div>
+<p>Initial commands are not supported for remote (<a href="./web-client.html">web client</a>) sessions -
+the CLI will error out.</p>
 <h2 id="list-sessions"><a class="header" href="#list-sessions"><code>list-sessions</code></a></h2>
 <p>short: <code>ls</code></p>
 <p>Will list all the names of currently running sessions.</p>
